@@ -1,5 +1,8 @@
 import hashlib
-import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR.joinpath("data")
 
 
 def get_sha256(filename):
@@ -15,14 +18,9 @@ def get_sha256(filename):
 
 
 def get_sha256_dir(dir):
-    sha256sums = []
-    for root, _, files in os.walk(dir, topdown=False):
-        for name in files:
-            file = os.path.join(root, name)
-            sha256sums.append((get_sha256(file), file))
-
+    sha256sums = [(get_sha256(file), file) for file in dir.rglob("*") if file.is_file()]
     return sha256sums
 
 
-for md5sum_pair in get_sha256_dir("data"):
+for md5sum_pair in get_sha256_dir(DATA_DIR):
     print(md5sum_pair[0], md5sum_pair[1])
