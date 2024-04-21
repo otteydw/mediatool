@@ -22,5 +22,5 @@ def get_sha256_dir(dir):
     return sha256sums
 
 
-for md5sum_pair in get_sha256_dir(DATA_DIR):
-    print(md5sum_pair[0], md5sum_pair[1])
+for sha256sum_pair in get_sha256_dir(DATA_DIR):
+    print(sha256sum_pair[0], sha256sum_pair[1])
