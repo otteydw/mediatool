@@ -2,31 +2,18 @@ import hashlib
 from mimetypes import guess_type
 from pathlib import Path
 
-from sqlalchemy import Integer, String, create_engine, select, text
-from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
+from sqlalchemy import create_engine, select, text
+from sqlalchemy.orm import Session
+
+from models import Base, File
 
 BASE_DIR = Path(__file__).resolve().parent
 
-# DATA_DIR = BASE_DIR.joinpath("data")
-# DBFILE = BASE_DIR.joinpath("dingo.db")
+DATA_DIR = BASE_DIR.joinpath("data")
+DBFILE = BASE_DIR.joinpath("dingo.db")
 
-DATA_DIR = Path("/Volumes/media/Pictures")
-DBFILE = BASE_DIR.joinpath("media.db")
-
-
-class Base(DeclarativeBase):
-    pass
-
-
-class File(Base):
-    __tablename__ = "file"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(), unique=True)
-    size: Mapped[int] = mapped_column(Integer)
-    sha256: Mapped[str] = mapped_column(String(64))
-
-    def __repr__(self):
-        return f"File: {self.name}\nSize {self.size}\nSHA256: {self.sha256}"
+# DATA_DIR = Path("/Volumes/media/Pictures")
+# DBFILE = BASE_DIR.joinpath("media.db")
 
 
 def is_media(filename: Path):
