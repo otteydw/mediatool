@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from dupefinder import get_sha256, is_image, is_media, is_video
+from utils import get_sha256, is_image, is_media, is_video
 
 
 def test_get_sha256():

@@ -1,11 +1,10 @@
-import hashlib
-from mimetypes import guess_type
 from pathlib import Path
 
 from sqlalchemy import create_engine, select, text
 from sqlalchemy.orm import Session
 
 from models import Base, File
+from utils import get_sha256, is_media
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -14,38 +13,6 @@ DBFILE = BASE_DIR.joinpath("dingo.db")
 
 # DATA_DIR = Path("/Volumes/media/Pictures")
 # DBFILE = BASE_DIR.joinpath("media.db")
-
-
-def is_media(filename: Path):
-    guessed_type = guess_type(filename)[0]
-    return True if guessed_type and guessed_type.startswith(("image", "video")) else False
-
-
-def is_image(filename: Path):
-    guessed_type = guess_type(filename)[0]
-    return True if guessed_type and guessed_type.startswith("image") else False
-
-
-def is_video(filename: Path):
-    guessed_type = guess_type(filename)[0]
-    return True if guessed_type and guessed_type.startswith("video") else False
-
-
-def get_sha256(filename):
-    print(f"Getting sha256 of {filename}")
-    with open(filename, "rb") as f:
-        file_hash = hashlib.sha256()
-        chunk = f.read(8192)
-        while chunk:
-            file_hash.update(chunk)
-            chunk = f.read(8192)
-
-    return file_hash.hexdigest()
-
-
-# def get_info_dir(dir):
-#     info = [(get_sha256(file), file.stat().st_size, file) for file in dir.rglob("*") if file.is_file()]
-#     return info
 
 
 def fill_database(session, dir: Path, commit_every=10):
