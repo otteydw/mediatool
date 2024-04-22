@@ -1,6 +1,13 @@
+import enum
 import hashlib
 from mimetypes import guess_type
 from pathlib import Path
+
+
+class MediaType(enum.Enum):
+    image = 1
+    video = 2
+    unknown = 3
 
 
 def is_media(filename: Path):
@@ -16,6 +23,15 @@ def is_image(filename: Path):
 def is_video(filename: Path):
     guessed_type = guess_type(filename)[0]
     return True if guessed_type and guessed_type.startswith("video") else False
+
+
+def get_media_type(filename: Path):
+    if is_image(filename):
+        return MediaType.image
+    elif is_video(filename):
+        return MediaType.video
+    else:
+        return MediaType.unknown
 
 
 def get_sha256(filename):

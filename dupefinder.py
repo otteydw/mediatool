@@ -4,12 +4,13 @@ from sqlalchemy import create_engine, select, text
 from sqlalchemy.orm import Session
 
 from models import Base, File
-from utils import get_sha256, is_media
+from utils import get_media_type, get_sha256, is_media
 
 BASE_DIR = Path(__file__).resolve().parent
 
 DATA_DIR = BASE_DIR.joinpath("data")
 DBFILE = BASE_DIR.joinpath("dingo.db")
+DBFILE = BASE_DIR.joinpath("dingo_new.db")
 
 # DATA_DIR = Path("/Volumes/media/Pictures")
 # DBFILE = BASE_DIR.joinpath("media.db")
@@ -32,7 +33,8 @@ def fill_database(session, dir: Path, commit_every=10):
                 if pathname not in existing_paths and (is_media(pathname)):
                     size = file.stat().st_size
                     sha256 = get_sha256(file)
-                    this_file = File(name=pathname, size=size, sha256=sha256)
+                    media_type = get_media_type(pathname)
+                    this_file = File(name=pathname, size=size, sha256=sha256, filetype=media_type)
                     session.add(this_file)
                     counter += 1
                     if counter == commit_every:

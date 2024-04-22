@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from utils import get_sha256, is_image, is_media, is_video
+from utils import MediaType, get_media_type, get_sha256, is_image, is_media, is_video
 
 
 def test_get_sha256():
@@ -29,3 +29,9 @@ def test_is_media():
     assert is_media(Path("/path/does/not/matter/filename.jpg")) is True
     assert is_media(Path("/path/does/not/matter/filename.txt")) is False
     assert is_media(Path("/path/does/not/matter/filename.ini")) is False
+
+
+def test_get_media_type():
+    assert get_media_type(Path("/path/does/not/matter/filename.jpg")) == MediaType.image
+    assert get_media_type(Path("/path/does/not/matter/filename.mov")) == MediaType.video
+    assert get_media_type(Path("/path/does/not/matter/filename.txt")) == MediaType.unknown
