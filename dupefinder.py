@@ -4,16 +4,16 @@ from sqlalchemy import create_engine, select, text
 from sqlalchemy.orm import Session
 
 from models import Base, File
-from utils import get_sha256, is_media
+from utils import get_datestamp, get_media_type, get_sha256, is_image
 
 BASE_DIR = Path(__file__).resolve().parent
 
-DATA_DIR = BASE_DIR.joinpath("data")
+# DATA_DIR = BASE_DIR.joinpath("data")
 # DBFILE = BASE_DIR.joinpath("dingo.db")
-DBFILE = BASE_DIR.joinpath("dingo_new.db")
+# DBFILE = BASE_DIR.joinpath("dingo_new.db")
 
-# DATA_DIR = Path("/Volumes/media/Pictures")
-# DBFILE = BASE_DIR.joinpath("media.db")
+DATA_DIR = Path("/Volumes/media/Pictures")
+DBFILE = BASE_DIR.joinpath("media.db")
 
 
 def fill_database(session: Session, dir: Path, commit_every=10):
@@ -30,16 +30,13 @@ def fill_database(session: Session, dir: Path, commit_every=10):
             for file in paths:
                 pathname = str(file)
                 # print(pathname)
-                if pathname not in existing_paths and (is_media(pathname)):
+                if pathname not in existing_paths and (is_image(pathname)):
                     size = file.stat().st_size
                     sha256 = get_sha256(file)
-                    # media_type = get_media_type(pathname)
-                    # datestamp = get_datestamp(pathname) if is_image(pathname) else None
-                    # this_file = File(name=pathname, size=size, sha256=sha256, filetype=media_type, datestamp=datestamp)
-                    this_file = File(name=pathname, size=size, sha256=sha256)
+                    media_type = get_media_type(pathname)
+                    datestamp = get_datestamp(pathname) if is_image(pathname) else None
+                    this_file = File(name=pathname, size=size, sha256=sha256, filetype=media_type, datestamp=datestamp)
                     session.add(this_file)
-                    # if is_image(pathname):
-                    #     print()
                     counter += 1
                     if counter == commit_every:
                         session.commit()
