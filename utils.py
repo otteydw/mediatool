@@ -1,7 +1,10 @@
 import enum
 import hashlib
+from datetime import datetime
 from mimetypes import guess_type
 from pathlib import Path
+
+from exif import Image
 
 
 class MediaType(enum.Enum):
@@ -44,6 +47,24 @@ def get_sha256(filename):
             chunk = f.read(8192)
 
     return file_hash.hexdigest()
+
+
+def get_datestamp(image_path: Path):
+    image_type = guess_type(image_path)[0]
+    if not image_type.endswith(("jpeg", "png")):
+        return None
+
+    with open(image_path, "rb") as image_file:
+        image = Image(image_file)
+
+    if not image.has_exif:
+        return None
+
+    if hasattr(image, "datetime"):
+        date_obj = datetime.strptime(image.datetime, "%Y:%m:%d %H:%M:%S")
+    else:
+        date_obj = None
+    return date_obj
 
 
 # def get_info_dir(dir):
