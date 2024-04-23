@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 from sqlalchemy import create_engine, select, text
@@ -5,6 +6,26 @@ from sqlalchemy.orm import Session
 
 from models import Base, File
 from utils import get_datestamp, get_media_type, get_sha256, is_image
+
+# BEGIN Logging configuration
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+logfile = logging.FileHandler("dupefinder.log")
+logfile.setLevel(logging.INFO)
+fileformat = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s")
+logfile.setFormatter(fileformat)
+logger.addHandler(logfile)
+
+stream = logging.StreamHandler()
+stream.setLevel(logging.INFO)
+logger.addHandler(stream)
+# END Logging Configuration
+
+debug = True
+if debug:
+    logfile.setLevel(logging.DEBUG)
+    stream.setLevel(logging.DEBUG)
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -25,12 +46,14 @@ def fill_database(session: Session, dir: Path, commit_every=10):
     counter = 0
     for root, dirs, files in dir.walk():
         if len(files) > 0:
-            print(root)
+            logger.info(f"Root: {root}")
             paths = [Path(root).joinpath(file) for file in files]
             for file in paths:
                 pathname = str(file)
                 # print(pathname)
+                logger.debug(f"Inspecting file {pathname}")
                 if pathname not in existing_paths and (is_image(pathname)):
+                    logger.info(f"Processing file {pathname}")
                     size = file.stat().st_size
                     sha256 = get_sha256(file)
                     media_type = get_media_type(pathname)
@@ -67,8 +90,8 @@ def process_duplicates(session):
         statement = select(File).filter_by(sha256=checksum)
         dupe_sets = [row.File for row in session.execute(statement).all()]
         for dupe_set in dupe_sets:
-            print(dupe_set.name)
-        print()
+            logger.info(dupe_set.name)
+        logger.info()
 
 
 def main():
