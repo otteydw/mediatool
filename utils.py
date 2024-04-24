@@ -1,10 +1,14 @@
 import enum
 import hashlib
+import logging
 from datetime import datetime
 from mimetypes import guess_type
 from pathlib import Path
 
 from exif import Image
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class MediaType(enum.Enum):
@@ -50,12 +54,23 @@ def get_sha256(filename):
 
 
 def get_datestamp(image_path: Path):
+    logger.info(f"Attempting get_datastamp of {image_path}")
     image_type = guess_type(image_path)[0]
     if not image_type.endswith(("jpeg", "png")):
         return None
 
-    with open(image_path, "rb") as image_file:
-        image = Image(image_file)
+    try:
+        with open(image_path, "rb") as image_file:
+            image = Image(image_file)
+    except (
+        Exception
+    ) as e:  # This is not good, but I can't figure out exactly what exception is being raised. I will deal with it later.
+        if "TiffByteOrder" in str(e):
+            logger.exception(f"Invalid byte order encountered in image {image_path}. Ignoring Exif data.")
+            return None
+        else:
+            logger.exception("Encountered unknown exception")
+            raise e
 
     if not image.has_exif:
         return None

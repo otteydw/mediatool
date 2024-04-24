@@ -4,37 +4,25 @@ from pathlib import Path
 from sqlalchemy import create_engine, select, text
 from sqlalchemy.orm import Session
 
+from logging_setup import logging_setup
 from models import Base, File
 from utils import get_datestamp, get_media_type, get_sha256, is_image
 
-# BEGIN Logging configuration
+logging_setup()
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
-logfile = logging.FileHandler("dupefinder.log")
-logfile.setLevel(logging.INFO)
-fileformat = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s")
-logfile.setFormatter(fileformat)
-logger.addHandler(logfile)
-
-stream = logging.StreamHandler()
-stream.setLevel(logging.INFO)
-logger.addHandler(stream)
-# END Logging Configuration
 
 debug = True
 if debug:
-    logfile.setLevel(logging.DEBUG)
-    stream.setLevel(logging.DEBUG)
+    logger.setLevel(logging.DEBUG)
 
 BASE_DIR = Path(__file__).resolve().parent
 
-# DATA_DIR = BASE_DIR.joinpath("data")
-# DBFILE = BASE_DIR.joinpath("dingo.db")
-# DBFILE = BASE_DIR.joinpath("dingo_new.db")
+DATA_DIR = BASE_DIR.joinpath("data")
+DBFILE = BASE_DIR.joinpath("dingo.db")
 
-DATA_DIR = Path("/Volumes/media/Pictures")
-DBFILE = BASE_DIR.joinpath("media.db")
+# DATA_DIR = Path("/Volumes/media/Pictures")
+# DBFILE = BASE_DIR.joinpath("media.db")
 
 
 def fill_database(session: Session, dir: Path, commit_every=10):
