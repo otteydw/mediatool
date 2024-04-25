@@ -1,6 +1,15 @@
+from datetime import datetime
 from pathlib import Path
 
-from utils import MediaType, get_media_type, get_sha256, is_image, is_media, is_video
+from utils import (
+    MediaType,
+    get_datestamp,
+    get_media_type,
+    get_sha256,
+    is_image,
+    is_media,
+    is_video,
+)
 
 
 def test_get_sha256():
@@ -35,3 +44,10 @@ def test_get_media_type():
     assert get_media_type(Path("/path/does/not/matter/filename.jpg")) == MediaType.image
     assert get_media_type(Path("/path/does/not/matter/filename.mov")) == MediaType.video
     assert get_media_type(Path("/path/does/not/matter/filename.txt")) == MediaType.unknown
+
+
+def test_get_datestamp():
+    assert get_datestamp("/Users/dottey/git/dupefinder/data/Rose/20210612_091420.jpg") == datetime.strptime(
+        "2021-06-12 09:14:20", "%Y-%m-%d %H:%M:%S"
+    )
+    assert get_datestamp("/Users/dottey/git/dupefinder/data/problems/IMG_9846.PNG") is None

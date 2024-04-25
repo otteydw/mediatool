@@ -93,5 +93,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # image_path = Path("/Users/dottey/git/dupefinder/data/Rose/20210612_091422.jpg")
-    # print(get_datestamp(image_path))
