@@ -25,7 +25,7 @@ DBFILE = BASE_DIR.joinpath("dingo.db")
 # DBFILE = BASE_DIR.joinpath("media.db")
 
 
-def fill_database(session: Session, dir: Path, commit_every=10):
+def fill_database(session: Session, dir: Path, commit_every=20):
     # all_files = [file for file in dir.rglob("*") if file.is_file()]
     # print("Got all_files")
     existing_paths = [path.name for path in session.query(File.name).all()]
@@ -41,7 +41,7 @@ def fill_database(session: Session, dir: Path, commit_every=10):
                 # print(pathname)
                 logger.debug(f"Inspecting file {pathname}")
                 if pathname not in existing_paths and (is_image(pathname)):
-                    logger.info(f"Processing file {pathname}")
+                    logger.debug(f"Adding file {pathname}")
                     size = file.stat().st_size
                     sha256 = get_sha256(file)
                     media_type = get_media_type(pathname)
@@ -49,20 +49,21 @@ def fill_database(session: Session, dir: Path, commit_every=10):
                     this_file = File(name=pathname, size=size, sha256=sha256, filetype=media_type, datestamp=datestamp)
                     session.add(this_file)
                     counter += 1
-                    if counter == commit_every:
-                        session.commit()
-                        counter = 0
-                # elif pathname in existing_paths and (is_media(pathname)):
-                #     # stmt = select(File.name).where(File.name==pathname)
-                #     # this_file = session.execute(stmt).scalar_one()
-                #     # this_file = session.query(File.name, File.size).where(File.name == pathname).first()
-                #     # this_file = session.query(File.name, File.size).get(File.name==pathname)
-                #     this_file = File.query.filter_by(name=pathname).first()
-                #     print(f"Found {this_file.name} with size {this_file.size}")
-                #     this_file.size=10
-                #     session.update(this_file)
-                #     session.commit()
-                #     print()
+                elif pathname in existing_paths and (is_image(pathname)):
+                    updated = False
+                    logger.debug(f"Updaing file {pathname}")
+                    existing_record = session.query(File).filter(File.name == pathname).one_or_none()
+                    if not existing_record.datestamp:
+                        existing_record.datestamp = get_datestamp(pathname) if is_image(pathname) else None
+                        updated = True
+                    if not existing_record.filetype:
+                        existing_record.filetype = get_media_type(pathname)
+                        updated = True
+                    if updated:
+                        counter += 1
+                if counter == commit_every:
+                    session.commit()
+                    counter = 0
             session.commit()
 
 
@@ -74,12 +75,15 @@ def find_duplicate_checksums(session: Session):
 
 def process_duplicates(session):
     duplicate_checksums = [checksum for checksum in find_duplicate_checksums(session)]
+
+    duplicates = {}
     for checksum in duplicate_checksums:
         statement = select(File).filter_by(sha256=checksum)
-        dupe_sets = [row.File for row in session.execute(statement).all()]
-        for dupe_set in dupe_sets:
-            logger.info(dupe_set.name)
-        logger.info()
+        duplicates_of_checksum = [dupe_set.name for dupe_set in [row.File for row in session.execute(statement).all()]]
+        duplicates[checksum] = duplicates_of_checksum
+
+    for checksum, files in duplicates.items():
+        logger.info(f"Duplicates of {checksum}: {files}")
 
 
 def main():
