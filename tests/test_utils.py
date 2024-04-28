@@ -3,12 +3,14 @@ from pathlib import Path
 
 from utils import (
     MediaType,
+    datestamp_to_filename_stem,
     get_datestamp,
     get_media_type,
     get_sha256,
     is_image,
     is_media,
     is_video,
+    recommended_filename,
 )
 
 
@@ -51,3 +53,16 @@ def test_get_datestamp():
         "2021-06-12 09:14:20", "%Y-%m-%d %H:%M:%S"
     )
     assert get_datestamp("/Users/dottey/git/dupefinder/data/problems/IMG_9846.PNG") is None
+
+
+def test_datestamp_to_filenam_stem():
+    assert (
+        datestamp_to_filename_stem(datetime.strptime("2021-06-12 09:14:20", "%Y-%m-%d %H:%M:%S")) == "20210612_091420"
+    )
+
+
+def test_recommended_filename():
+    assert recommended_filename(
+        Path("/Users/dottey/git/dupefinder/data/Rose/20210612_091420_cap_extension.JPG")
+    ) == Path("/Users/dottey/git/dupefinder/data/Rose/20210612_091420.jpg")
+    assert recommended_filename(Path("/path/does/not/exist.txt")) is None

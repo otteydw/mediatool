@@ -54,7 +54,7 @@ def get_sha256(filename):
 
 
 def get_datestamp(image_path: Path):
-    logger.info(f"Attempting get_datastamp of {image_path}")
+    logger.debug(f"Attempting get_datastamp of {image_path}")
     image_type = guess_type(image_path)[0]
     if not image_type.endswith(("jpeg", "png")):
         return None
@@ -80,6 +80,30 @@ def get_datestamp(image_path: Path):
     else:
         date_obj = None
     return date_obj
+
+
+def datestamp_to_filename_stem(date_obj: datetime):
+    return date_obj.strftime("%Y%m%d_%H%M%S")
+
+
+def recommended_filename(image_path: Path):
+    image_type = guess_type(image_path)[0]
+    if image_type.endswith("jpeg"):
+        new_extension = "jpg"
+    elif image_type.endswith("png"):
+        new_extension = "png"
+    else:
+        return None
+
+    datestamp_from_image = get_datestamp(image_path)
+    if not datestamp_from_image:
+        return None
+
+    new_stem = datestamp_to_filename_stem(datestamp_from_image)
+    parent_directory = image_path.parent
+
+    new_filename = parent_directory.joinpath(f"{new_stem}.{new_extension}")
+    return new_filename
 
 
 # def get_info_dir(dir):
