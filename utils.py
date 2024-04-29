@@ -1,6 +1,7 @@
 import enum
 import hashlib
 import logging
+import re
 from datetime import datetime
 from mimetypes import guess_type
 from pathlib import Path
@@ -53,6 +54,40 @@ def get_sha256(filename):
     return file_hash.hexdigest()
 
 
+def datestring_to_date(datestring: str):
+    """Convert a string seeming to contain a timestamp into a datetime object.
+
+    This function helps to convert odd timestamps coming from exif data. Some such stamps have
+    * hyphens or colons seperating the year, month and date
+    * a decimal containing the microseconds
+
+    Args:
+        datestring (str): A timestamp-like value
+    """
+
+    logger.debug(f"Original datetime is {datestring}")
+
+    PATTERNS = [
+        {"regex": r"([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$", "format": "%Y-%m-%d %H:%M:%S"},
+        {"regex": r"([0-9]{4}):([0-9]{2}):([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$", "format": "%Y:%m:%d %H:%M:%S"},
+        {
+            "regex": r"([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})\.([0-9]{0,6})$",
+            "format": "%Y-%m-%d %H:%M:%S.%f",
+        },
+        {
+            "regex": r"([0-9]{4}):([0-9]{2}):([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})\.([0-9]{0,6})$",
+            "format": "%Y:%m:%d %H:%M:%S.%f",
+        },
+    ]
+
+    for pattern in PATTERNS:
+        if re.match(pattern["regex"], datestring):
+            date_obj = datetime.strptime(datestring, pattern["format"])
+            return date_obj
+
+    raise ValueError(f"Unknown datetime format for {datestring}")
+
+
 def get_datestamp(image_path: Path):
     logger.debug(f"Attempting get_datastamp of {image_path}")
     image_type = guess_type(image_path)[0]
@@ -76,12 +111,7 @@ def get_datestamp(image_path: Path):
         return None
 
     if hasattr(image, "datetime"):
-        logger.debug(f"Original datetime is {image.datetime}")
-        try:
-            date_obj = datetime.strptime(image.datetime, "%Y:%m:%d %H:%M:%S.%f")
-        except ValueError as e:
-            if len(e.args) > 0 and "does not match format" in e.args[0]:
-                date_obj = datetime.strptime(image.datetime, "%Y:%m:%d %H:%M:%S")
+        date_obj = datestring_to_date(image.datetime)
     else:
         date_obj = None
     return date_obj

@@ -1,9 +1,12 @@
 from datetime import datetime
 from pathlib import Path
 
+import pytest
+
 from utils import (
     MediaType,
     datestamp_to_filename_stem,
+    datestring_to_date,
     get_datestamp,
     get_media_type,
     get_sha256,
@@ -54,7 +57,7 @@ def test_get_datestamp():
     )
     assert get_datestamp(
         "/Users/dottey/git/dupefinder/data/problems/20181125_070907_IMG_2933.JPG"
-    ) == datetime.strptime("2018-11-25 07:09:07.547", "%Y-%m-%d %H:%M:%S.%f")
+    ) == datetime.strptime("2018-11-25 07:09:07.547000", "%Y-%m-%d %H:%M:%S.%f")
     assert get_datestamp("/Users/dottey/git/dupefinder/data/problems/IMG_9846.PNG") is None
 
 
@@ -69,3 +72,17 @@ def test_recommended_filename():
         Path("/Users/dottey/git/dupefinder/data/Rose/20210612_091420_cap_extension.JPG")
     ) == Path("/Users/dottey/git/dupefinder/data/Rose/20210612_091420.jpg")
     assert recommended_filename(Path("/path/does/not/exist.txt")) is None
+
+
+def test_datestring_to_date():
+    assert datestring_to_date("2021-06-12 09:14:20") == datetime.strptime("2021-06-12 09:14:20", "%Y-%m-%d %H:%M:%S")
+    assert datestring_to_date("2021:06:12 09:14:20") == datetime.strptime("2021-06-12 09:14:20", "%Y-%m-%d %H:%M:%S")
+    assert datestring_to_date("2021:06:12 09:14:20.345000") == datetime.strptime(
+        "2021-06-12 09:14:20.345000", "%Y-%m-%d %H:%M:%S.%f"
+    )
+    assert datestring_to_date("2021:06:12 09:14:20.345") == datetime.strptime(
+        "2021-06-12 09:14:20.345000", "%Y-%m-%d %H:%M:%S.%f"
+    )
+
+    with pytest.raises(ValueError):
+        datestring_to_date("2021x06x12 09:14:20.345000")
