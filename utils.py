@@ -67,6 +67,9 @@ def datestring_to_date(datestring: str):
 
     logger.debug(f"Original datetime is {datestring}")
 
+    if datestring == "" or "0000" in datestring:
+        return None
+
     PATTERNS = [
         {"regex": r"([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$", "format": "%Y-%m-%d %H:%M:%S"},
         {"regex": r"([0-9]{4}):([0-9]{2}):([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$", "format": "%Y:%m:%d %H:%M:%S"},

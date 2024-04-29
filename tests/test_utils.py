@@ -83,6 +83,8 @@ def test_datestring_to_date():
     assert datestring_to_date("2021:06:12 09:14:20.345") == datetime.strptime(
         "2021-06-12 09:14:20.345000", "%Y-%m-%d %H:%M:%S.%f"
     )
+    assert datestring_to_date("") is None
+    assert datestring_to_date("0000:00:00 00:00:00") is None
 
     with pytest.raises(ValueError):
         datestring_to_date("2021x06x12 09:14:20.345000")
