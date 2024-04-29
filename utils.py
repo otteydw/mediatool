@@ -76,7 +76,12 @@ def get_datestamp(image_path: Path):
         return None
 
     if hasattr(image, "datetime"):
-        date_obj = datetime.strptime(image.datetime, "%Y:%m:%d %H:%M:%S")
+        logger.debug(f"Original datetime is {image.datetime}")
+        try:
+            date_obj = datetime.strptime(image.datetime, "%Y:%m:%d %H:%M:%S.%f")
+        except ValueError as e:
+            if len(e.args) > 0 and "does not match format" in e.args[0]:
+                date_obj = datetime.strptime(image.datetime, "%Y:%m:%d %H:%M:%S")
     else:
         date_obj = None
     return date_obj

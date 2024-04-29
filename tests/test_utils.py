@@ -52,6 +52,9 @@ def test_get_datestamp():
     assert get_datestamp("/Users/dottey/git/dupefinder/data/Rose/20210612_091420.jpg") == datetime.strptime(
         "2021-06-12 09:14:20", "%Y-%m-%d %H:%M:%S"
     )
+    assert get_datestamp(
+        "/Users/dottey/git/dupefinder/data/problems/20181125_070907_IMG_2933.JPG"
+    ) == datetime.strptime("2018-11-25 07:09:07.547", "%Y-%m-%d %H:%M:%S.%f")
     assert get_datestamp("/Users/dottey/git/dupefinder/data/problems/IMG_9846.PNG") is None
 
 
