@@ -6,7 +6,8 @@ from datetime import datetime
 from mimetypes import guess_type
 from pathlib import Path
 
-from exif import Image
+from PIL import Image
+from PIL.ExifTags import Base as ExifBase
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -97,26 +98,21 @@ def get_datestamp(image_path: Path):
     if not image_type.endswith(("jpeg", "png")):
         return None
 
-    try:
-        with open(image_path, "rb") as image_file:
-            image = Image(image_file)
-    except (
-        Exception
-    ) as e:  # This is not good, but I can't figure out exactly what exception is being raised. I will deal with it later.
-        if "TiffByteOrder" in str(e):
-            logger.exception(f"Invalid byte order encountered in image {image_path}. Ignoring Exif data.")
-            return None
-        else:
-            logger.exception("Encountered unknown exception")
-            raise e
+    with open(image_path, "rb") as image_file:
+        logger.debug(f"Opening image {image_path}")
+        exif = Image.open(image_file).getexif()
+        # logger.debug("Opened")
 
-    if not image.has_exif:
+    if not exif:
         return None
 
-    if hasattr(image, "datetime"):
-        date_obj = datestring_to_date(image.datetime)
+    if ExifBase.DateTimeOriginal in exif.keys():
+        date_obj = datestring_to_date(exif[ExifBase.DateTimeOriginal])
+    elif ExifBase.DateTime in exif.keys():
+        date_obj = datestring_to_date(exif[ExifBase.DateTime])
     else:
-        date_obj = None
+        return None
+
     return date_obj
 
 
