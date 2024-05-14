@@ -61,6 +61,10 @@ def test_get_datestamp():
     assert get_datestamp("/Users/dottey/git/dupefinder/data/problems/IMG_9846.PNG") is None
     assert get_datestamp("/Users/dottey/git/dupefinder/data/problems/hidden_PICT0200.JPG") is None
 
+    # Hockey and stuff 014.JPG may be corrupt. Revisit later.
+    # OSError: Unsupported BMP header type (65536)
+    assert get_datestamp("/Users/dottey/git/dupefinder/data/problems/Hockey and stuff 014.JPG") is None
+
 
 def test_datestamp_to_filenam_stem():
     assert (

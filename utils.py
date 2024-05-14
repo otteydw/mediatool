@@ -109,6 +109,9 @@ def get_datestamp(image_path: Path):
     except UnidentifiedImageError:
         logger.warning(f"UnidentifiedImageError while opening {image_path}")
         return None
+    except Exception as e:
+        logger.error(f"Unknown exception: {e} while opening {image_path}")
+        return None
 
     if not exif:
         return None
