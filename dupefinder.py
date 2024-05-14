@@ -1,12 +1,20 @@
 import logging
 from pathlib import Path
 
+from rich.console import Console
+from rich.table import Table
 from sqlalchemy import create_engine, select, text
 from sqlalchemy.orm import Session
 
 from logging_setup import logging_setup
 from models import Base, File
-from utils import get_datestamp, get_media_type, get_sha256, is_image
+from utils import (
+    get_datestamp,
+    get_media_type,
+    get_sha256,
+    is_image,
+    recommended_filename,
+)
 
 logging_setup()
 logger = logging.getLogger(__name__)
@@ -26,6 +34,7 @@ DBFILE = BASE_DIR.joinpath("dingo.db")
 
 
 def fill_database(session: Session, dir: Path, commit_every=20):
+    logger.debug(f"Beginning investigation of {dir}")
     # all_files = [file for file in dir.rglob("*") if file.is_file()]
     # print("Got all_files")
     existing_paths = [path.name for path in session.query(File.name).all()]
@@ -51,15 +60,19 @@ def fill_database(session: Session, dir: Path, commit_every=20):
                     counter += 1
                 elif pathname in existing_paths and (is_image(pathname)):
                     updated = False
-                    logger.debug(f"Updaing file {pathname}")
+                    logger.debug(f"Checking {pathname} for updates.")
                     existing_record = session.query(File).filter(File.name == pathname).one_or_none()
                     if not existing_record.datestamp:
-                        existing_record.datestamp = get_datestamp(pathname) if is_image(pathname) else None
-                        updated = True
+                        # Check if the file has a datestamp and update it in the database only if it does.
+                        this_datestamp = get_datestamp(pathname) if is_image(pathname) else None
+                        if this_datestamp:
+                            existing_record.datestamp = this_datestamp
+                            updated = True
                     if not existing_record.filetype:
                         existing_record.filetype = get_media_type(pathname)
                         updated = True
                     if updated:
+                        logger.debug(f"Updating file {pathname}")
                         counter += 1
                 if counter == commit_every:
                     session.commit()
@@ -76,6 +89,8 @@ def find_duplicate_checksums(session: Session):
 def process_duplicates(session):
     duplicate_checksums = [checksum for checksum in find_duplicate_checksums(session)]
 
+    console = Console()
+
     duplicates = {}
     for checksum in duplicate_checksums:
         statement = select(File).filter_by(sha256=checksum)
@@ -83,7 +98,18 @@ def process_duplicates(session):
         duplicates[checksum] = duplicates_of_checksum
 
     for checksum, files in duplicates.items():
-        logger.info(f"Duplicates of {checksum}: {files}")
+        table = Table(title=f"Duplicates of {checksum}")
+        table.add_column("Parent")
+        table.add_column("Filename")
+        table.add_column("Recommend")
+        for file in files:
+            this_file = Path(file)
+            parent = str(this_file.parent)
+            name = str(this_file.name)
+            recommend = recommended_filename(this_file)
+            recommend = str(recommend.name) if recommend else ""
+            table.add_row(parent, name, recommend)
+        console.print(table)
 
 
 def main():
