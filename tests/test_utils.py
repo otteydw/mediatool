@@ -59,6 +59,7 @@ def test_get_datestamp():
         "/Users/dottey/git/dupefinder/data/problems/20181125_070907_IMG_2933.JPG"
     ) == datetime.strptime("2018-11-25 07:09:07.547000", "%Y-%m-%d %H:%M:%S.%f")
     assert get_datestamp("/Users/dottey/git/dupefinder/data/problems/IMG_9846.PNG") is None
+    assert get_datestamp("/Users/dottey/git/dupefinder/data/problems/hidden_PICT0200.JPG") is None
 
 
 def test_datestamp_to_filenam_stem():

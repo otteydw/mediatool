@@ -6,7 +6,7 @@ from datetime import datetime
 from mimetypes import guess_type
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import Base as ExifBase
 
 logger = logging.getLogger(__name__)
@@ -98,10 +98,14 @@ def get_datestamp(image_path: Path):
     if not image_type.endswith(("jpeg", "png")):
         return None
 
-    with open(image_path, "rb") as image_file:
-        logger.debug(f"Opening image {image_path}")
-        exif = Image.open(image_file).getexif()
-        # logger.debug("Opened")
+    try:
+        with open(image_path, "rb") as image_file:
+            logger.debug(f"Opening image {image_path}")
+            exif = Image.open(image_file).getexif()
+            # logger.debug("Opened")
+    except UnidentifiedImageError:
+        logger.warning(f"UnidentifiedImageError while opening {image_path}")
+        return None
 
     if not exif:
         return None
