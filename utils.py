@@ -12,6 +12,9 @@ from PIL.ExifTags import Base as ExifBase
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+pil_logger = logging.getLogger("PIL")
+pil_logger.setLevel(logging.INFO)
+
 
 class MediaType(enum.Enum):
     image = 1
