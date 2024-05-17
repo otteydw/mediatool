@@ -25,7 +25,7 @@
             "formatter": "verbose",
             "when": "D",
             "backupCount": 0,
-            "filename": "dupefinder.log"
+            "filename": "mediatool.log"
         }
     },
     "loggers": {
