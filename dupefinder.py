@@ -78,6 +78,7 @@ def fill_database(session: Session, dir: Path, commit_every=20):
                     session.commit()
                     counter = 0
             session.commit()
+    logger.info("Completed database fill.")
 
 
 def find_duplicate_checksums(session: Session):
