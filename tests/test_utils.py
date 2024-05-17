@@ -19,7 +19,7 @@ from utils import (
 
 def test_get_sha256():
     assert (
-        get_sha256(Path("/Users/dottey/git/dupefinder/data/Rose/20210612_091422.jpg"))
+        get_sha256(Path("/Users/dottey/git/mediatool/data/Rose/20210612_091422.jpg"))
         == "80df98de279606939044478237271172399005e1d0b9cd8087fbfea704934020"
     )
 
@@ -52,18 +52,18 @@ def test_get_media_type():
 
 
 def test_get_datestamp():
-    assert get_datestamp("/Users/dottey/git/dupefinder/data/Rose/20210612_091420.jpg") == datetime.strptime(
+    assert get_datestamp("/Users/dottey/git/mediatool/data/Rose/20210612_091420.jpg") == datetime.strptime(
         "2021-06-12 09:14:20", "%Y-%m-%d %H:%M:%S"
     )
-    assert get_datestamp(
-        "/Users/dottey/git/dupefinder/data/problems/20181125_070907_IMG_2933.JPG"
-    ) == datetime.strptime("2018-11-25 07:09:07.547000", "%Y-%m-%d %H:%M:%S.%f")
-    assert get_datestamp("/Users/dottey/git/dupefinder/data/problems/IMG_9846.PNG") is None
-    assert get_datestamp("/Users/dottey/git/dupefinder/data/problems/hidden_PICT0200.JPG") is None
+    assert get_datestamp("/Users/dottey/git/mediatool/data/problems/20181125_070907_IMG_2933.JPG") == datetime.strptime(
+        "2018-11-25 07:09:07.547000", "%Y-%m-%d %H:%M:%S.%f"
+    )
+    assert get_datestamp("/Users/dottey/git/mediatool/data/problems/IMG_9846.PNG") is None
+    assert get_datestamp("/Users/dottey/git/mediatool/data/problems/hidden_PICT0200.JPG") is None
 
     # Hockey and stuff 014.JPG may be corrupt. Revisit later.
     # OSError: Unsupported BMP header type (65536)
-    assert get_datestamp("/Users/dottey/git/dupefinder/data/problems/Hockey and stuff 014.JPG") is None
+    assert get_datestamp("/Users/dottey/git/mediatool/data/problems/Hockey and stuff 014.JPG") is None
 
 
 def test_datestamp_to_filenam_stem():
@@ -74,8 +74,8 @@ def test_datestamp_to_filenam_stem():
 
 def test_recommended_filename():
     assert recommended_filename(
-        Path("/Users/dottey/git/dupefinder/data/Rose/20210612_091420_cap_extension.JPG")
-    ) == Path("/Users/dottey/git/dupefinder/data/Rose/20210612_091420.jpg")
+        Path("/Users/dottey/git/mediatool/data/Rose/20210612_091420_cap_extension.JPG")
+    ) == Path("/Users/dottey/git/mediatool/data/Rose/20210612_091420.jpg")
     assert recommended_filename(Path("/path/does/not/exist.txt")) is None
 
 
