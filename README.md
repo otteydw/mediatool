@@ -19,6 +19,14 @@ The dupefinder application uses the catalog previously created to report on whic
 python3 ./dupefinder.py
 ```
 
+# Quick Date
+
+A very simple script that displays the datestamp from an image.
+
+```shell
+python3 ./quick_date.py /path/to/image.jpg
+```
+
 # Requirements
 
 To run the programs, it is recommended to create a python virtual environment. Use pyenv or whatever tool you prefer to do that.
