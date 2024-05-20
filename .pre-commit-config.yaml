@@ -27,16 +27,6 @@ repos:
         args: [--fix]
         # Run the formatter.
         # - id: ruff-format
-  - repo: https://github.com/djlint/djLint
-    rev: v1.34.1
-    hooks:
-      - id: djlint-reformat-django
-      - id: djlint-django
-        args: ['--ignore=H030,H031']
-  - repo: https://github.com/google/yamlfmt
-    rev: v0.12.1
-    hooks:
-      - id: yamlfmt
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.13.0
     hooks:
