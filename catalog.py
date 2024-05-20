@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from logging_setup import logging_setup
 from models import Base, File
-from utils import get_datestamp, get_media_type, get_sha256, is_image
+from utils import get_datestamp, get_media_type, get_sha256, is_image, load_config
 
 logging_setup()
 logger = logging.getLogger(__name__)
@@ -15,14 +15,6 @@ logger = logging.getLogger(__name__)
 debug = True
 if debug:
     logger.setLevel(logging.DEBUG)
-
-BASE_DIR = Path(__file__).resolve().parent
-
-DATA_DIR = BASE_DIR.joinpath("data")
-DBFILE = BASE_DIR.joinpath("dingo.db")
-
-# DATA_DIR = Path("/Volumes/media/Pictures")
-# DBFILE = BASE_DIR.joinpath("media.db")
 
 
 def fill_database(session: Session, dir: Path, commit_every=20):
@@ -74,6 +66,7 @@ def fill_database(session: Session, dir: Path, commit_every=20):
 
 
 def main():
+    DATA_DIR, DBFILE = load_config("mediatool.ini")
     engine = create_engine(f"sqlite+pysqlite:///{DBFILE}", echo=False)
     Base.metadata.create_all(engine)
 

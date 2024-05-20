@@ -19,6 +19,16 @@ The dupefinder application uses the catalog previously created to report on whic
 python3 ./dupefinder.py
 ```
 
+# Configuration
+
+The tools utilize a common configuration file named `mediatool.ini`.
+
+```ini
+[mediatool]
+data_dir = /path/to/media/folder
+db_file = /path/to/database.db
+```
+
 # Quick Date
 
 A very simple script that displays the datestamp from an image.

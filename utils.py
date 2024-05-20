@@ -2,6 +2,8 @@ import enum
 import hashlib
 import logging
 import re
+import sys
+from configparser import ConfigParser
 from datetime import datetime
 from mimetypes import guess_type
 from pathlib import Path
@@ -153,3 +155,15 @@ def recommended_filename(image_path: Path):
 # def get_info_dir(dir):
 #     info = [(get_sha256(file), file.stat().st_size, file) for file in dir.rglob("*") if file.is_file()]
 #     return info
+
+
+def load_config(config_file):
+    config = ConfigParser()
+    try:
+        config.read(config_file)
+    except Exception as e:
+        logger.error(f"Unable to load configuration from {config_file}. {e}")
+        sys.exit(1)
+    DATA_DIR = Path(config.get("mediatool", "data_dir"))
+    DBFILE = Path(config.get("mediatool", "db_file"))
+    return DATA_DIR, DBFILE
