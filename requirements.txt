@@ -1,4 +1,5 @@
 click
+google-auth-oauthlib
 Pillow
-SQLAlchemy
 rich
+SQLAlchemy

@@ -1,6 +1,8 @@
 __pycache__
+.authtoken
 .DS_Store
 *.db*
 *.ini
 *.log*
+client_secret.json
 data/*
