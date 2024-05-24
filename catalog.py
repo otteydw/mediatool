@@ -66,7 +66,7 @@ def fill_database(session: Session, dir: Path, commit_every=20):
 
 
 def main():
-    DATA_DIR, DBFILE = load_config("mediatool.ini")
+    DATA_DIR, DBFILE = load_config("mediatool.ini", force_previous_database=False)
     engine = create_engine(f"sqlite+pysqlite:///{DBFILE}", echo=False)
     Base.metadata.create_all(engine)
 
