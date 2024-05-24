@@ -161,13 +161,22 @@ def get_recommended_filename(image_path: Path):
 #     return info
 
 
-def load_config(config_file):
+def load_config(config_file, force_previous_database=True):
     config = ConfigParser()
     try:
         config.read(config_file)
     except Exception as e:
         logger.error(f"Unable to load configuration from {config_file}. {e}")
         sys.exit(1)
+
     DATA_DIR = Path(config.get("mediatool", "data_dir"))
+    if not DATA_DIR.is_dir():
+        logger.error(f"{DATA_DIR} is not a valid directory.")
+        sys.exit(1)
+
     DBFILE = Path(config.get("mediatool", "db_file"))
+    if force_previous_database and not DBFILE.is_file():
+        logger.error(f"{DBFILE} is not available.")
+        sys.exit(1)
+
     return DATA_DIR, DBFILE
