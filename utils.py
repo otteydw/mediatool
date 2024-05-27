@@ -217,7 +217,6 @@ def consolidate_files(paths_to_consolidate: List[Path | PosixPath], target_path:
         temp_source = paths_to_consolidate.pop()
         if not dry_run:
             temp_source.rename(target_path)
-        # paths_to_consolidate[0].rename(Path("/Users/dottey/git/mediatool/data/dingo"))
         paths_to_remove = paths_to_consolidate
         logger.debug(f"T not in P: Paths to remove = {paths_to_remove}")
 
