@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from logging_setup import logging_setup
 from models import Base, File
-from utils import get_recommended_filename, load_config
+from utils import consolidate_files, get_recommended_filename, load_config
 
 logging_setup()
 logger = logging.getLogger(__name__)
@@ -42,16 +42,19 @@ def process_duplicates(session):
         duplicates_of_checksum = [dupe_set.name for dupe_set in [row.File for row in session.execute(statement).all()]]
         # duplicates[checksum] = duplicates_of_checksum
 
+        duplicates_of_checksum_paths = [Path(file) for file in duplicates_of_checksum]
         number_of_files_found = len(duplicates_of_checksum)
         table = Table(title=f"Duplicates of {checksum}")
         table.add_column("")
         table.add_column("Parent")
         table.add_column("Filename")
         # table.add_column("Recommend")
-        for file_number, file in enumerate(duplicates_of_checksum, start=1):
-            this_file = Path(file)
-            parent = str(this_file.parent)
-            name = str(this_file.name)
+        for file_number, file in enumerate(duplicates_of_checksum_paths, start=1):
+            # this_file = Path(file)
+            # parent = str(this_file.parent)
+            # name = str(this_file.name)
+            parent = str(file.parent)
+            name = str(file.name)
             # recommend = recommended_filename(this_file)
             # recommend = str(recommend.name) if recommend else ""
             table.add_row(str(file_number), parent, name)
@@ -62,9 +65,12 @@ def process_duplicates(session):
             if keep_number >= 1 and keep_number <= number_of_files_found:
                 break
 
-        console.print(f"We want to keep file {keep_number} which is {duplicates_of_checksum[keep_number-1]}")
+        file_to_keep = duplicates_of_checksum_paths[keep_number - 1]
+        console.print(f"We want to keep file {keep_number} which is {file_to_keep}")
 
-        recommended_filenames = [get_recommended_filename(Path(file)) for file in duplicates_of_checksum]
+        consolidate_files(duplicates_of_checksum_paths, file_to_keep)
+
+        recommended_filenames = [get_recommended_filename(path) for path in duplicates_of_checksum_paths]
         recommended_filenames = {str(file.name) for file in recommended_filenames if file}
 
         recommended_filename = str(first(recommended_filenames, "N/A"))
