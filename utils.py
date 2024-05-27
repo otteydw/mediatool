@@ -1,12 +1,14 @@
 import enum
 import hashlib
+import itertools
 import logging
 import re
 import sys
 from configparser import ConfigParser
 from datetime import datetime
 from mimetypes import guess_type
-from pathlib import Path
+from pathlib import Path, PosixPath
+from typing import List
 
 from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import Base as ExifBase
@@ -176,3 +178,55 @@ def load_config(config_file, force_previous_database=True):
         sys.exit(1)
 
     return DATA_DIR, DBFILE
+
+
+def consolidate_files(paths_to_consolidate: List[Path | PosixPath], target_path: Path, dry_run: bool = False) -> int:
+    """Consolidates a set of files into a single file. Essentially it deletes all files that are not the target file. If the target file is not one of the source files, then the first source file is moved to the target file path.
+
+    Args:
+        paths_to_consolidate (List[Path  |  PosixPath]): List of paths that should be consolidated.
+        target_path (Path): The single path that should remain afterward.
+        dry_run (bool, optional): In a dry run, the source files will be removed (unless the source is the same as the target). Defaults to False.
+
+    Raises:
+        TypeError: When the source or target is not a Path object.
+        ValueError: If the source or target is not a valid file.
+
+    Returns:
+        int: The number of files that were deleted. (In a dry_run it would be the number of files that would have been deleted.)
+    """
+
+    # Other error conditions I could handle...
+    # paths_to_consolidate is an empty list
+
+    # Ensure all inputs are valid files
+    for path in itertools.chain([target_path], paths_to_consolidate):
+        if not isinstance(path, Path):
+            raise TypeError(f"Invalid type for {str(path)}. Path expected, got '{type(path).__name__}'")
+    for path in paths_to_consolidate:
+        if not path.is_file():
+            raise ValueError(f"{path} is not a valid file.")
+
+    if target_path in paths_to_consolidate:
+        # Create paths_to_remove by removing target path from paths_to_consolidate
+        paths_to_remove = set(paths_to_consolidate) - set([target_path])
+        logger.debug(f"T in P: Paths to remove = {paths_to_remove}")
+    else:
+        logger.debug(f"T not in P: Paths to consolidate = {paths_to_consolidate}")
+
+        temp_source = paths_to_consolidate.pop()
+        if not dry_run:
+            temp_source.rename(target_path)
+        # paths_to_consolidate[0].rename(Path("/Users/dottey/git/mediatool/data/dingo"))
+        paths_to_remove = paths_to_consolidate
+        logger.debug(f"T not in P: Paths to remove = {paths_to_remove}")
+
+    total_files_deleted = 0
+    # Delete paths_to_remove
+    for path in paths_to_remove:
+        logger.debug(f"Deleting file {path}")
+        if not dry_run:
+            path.unlink()
+        total_files_deleted += 1
+
+    return total_files_deleted
