@@ -104,7 +104,7 @@ def create_or_retrieve_album(session, album_title):
     for a in getAlbums(session, False):
         if a["title"].lower() == album_title.lower():
             album_id = a["id"]
-            logger.info("Uploading into EXISTING photo album -- '{0}'".format(album_title))
+            logger.info("Using EXISTING photo album -- '{0}'".format(album_title))
             return album_id
 
     # No matches, create new album
@@ -116,7 +116,7 @@ def create_or_retrieve_album(session, album_title):
     logger.debug(f"Server response: {response}")
 
     if "id" in response:
-        logger.info(f"Uploading into NEW photo album -- '{album_title}'")
+        logger.info(f"Creating NEW photo album -- '{album_title}'")
         return response["id"]
     else:
         logger.error(f"Could not find or create photo album '{album_title}'. Server Response: {response}")
@@ -190,3 +190,35 @@ def upload_photos(session, photo_file_list, album_name):
         del session.headers["X-Goog-Upload-File-Name"]
     except KeyError:
         pass
+
+
+def get_photos_from_album(session, album_name):
+    album_id = create_or_retrieve_album(session, album_name) if album_name else None
+
+    # interrupt if no album is created / available
+    if album_name and not album_id:
+        return
+
+    print(f"Found album {album_name} with id {album_id}.")
+
+    album_list_body = {"albumId": album_id}
+    while True:
+        album_list_body_json = json.dumps(album_list_body)
+
+        media_items = session.post(
+            "https://photoslibrary.googleapis.com/v1/mediaItems:search", album_list_body_json
+        ).json()
+
+        logger.debug("Server response: {}".format(media_items))
+
+        if "mediaItems" in media_items:
+            for a in media_items["mediaItems"]:
+                yield a
+
+            if "nextPageToken" in media_items:
+                album_list_body["pageToken"] = media_items["nextPageToken"]
+            else:
+                return
+
+        else:
+            return
