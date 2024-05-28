@@ -8,21 +8,25 @@ from db_utils import consolidate_files_db
 from models import Base, File
 
 BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR.parent.joinpath("data")
+DATA_DIR = BASE_DIR.parent.joinpath("testdata")
 
 
 @pytest.mark.datafiles(DATA_DIR)
 def test_consolidate_files_db(datafiles: Path):
     DBFILE = datafiles.joinpath("dingo.db")
-    engine = create_engine(f"sqlite+pysqlite:///{DBFILE}", echo=False)
+    engine = create_engine(f"sqlite+pysqlite:///{DBFILE}", echo=True)
     Base.metadata.create_all(engine)
 
     sha256 = "3dcbca269c67a28a75c25d8e04b97172379af92eb23c764123adbd6271476cd0"
     with Session(engine) as session:
         duplicates = session.query(File).filter(File.sha256 == sha256).all()
-        duplicate_paths = [path.name for path in duplicates]
-        file_to_keep = duplicate_paths[0]
-        assert consolidate_files_db(session, duplicate_paths, file_to_keep) == len(duplicate_paths) - 1
+        # print(f"Found {len(duplicates)} total files.")
+        duplicates_as_paths = [Path(file.name) for file in duplicates]
+        path_to_keep = duplicates_as_paths[0]
+        removed_count = consolidate_files_db(session, duplicates_as_paths, path_to_keep)
+        # print(f"We removed {removed_count}")
+        assert removed_count == len(duplicates) - 1
 
         remaining = session.query(File).filter(File.sha256 == sha256).all()
+        # print(f"We have {len(remaining)} remaining")
         assert len(remaining) == 1

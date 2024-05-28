@@ -9,11 +9,11 @@ from utils import (
     datestring_to_date,
     get_datestamp,
     get_media_type,
+    get_recommended_filename,
     get_sha256,
     is_image,
     is_media,
     is_video,
-    recommended_filename,
 )
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -75,11 +75,11 @@ def test_datestamp_to_filenam_stem():
     )
 
 
-def test_recommended_filename():
-    assert recommended_filename(DATA_DIR.joinpath("Rose/20210612_091420_cap_extension.JPG")) == DATA_DIR.joinpath(
+def test_get_recommended_filename():
+    assert get_recommended_filename(DATA_DIR.joinpath("Rose/20210612_091420_cap_extension.JPG")) == DATA_DIR.joinpath(
         "Rose/20210612_091420.jpg"
     )
-    assert recommended_filename(Path("/path/does/not/exist.txt")) is None
+    assert get_recommended_filename(Path("/path/does/not/exist.txt")) is None
 
 
 def test_datestring_to_date():
