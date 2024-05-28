@@ -61,7 +61,7 @@ def process_duplicates(session):
         file_to_keep = duplicates_of_checksum[keep_number - 1]
         console.print(f"We want to keep file {keep_number} which is {file_to_keep}")
 
-        # For now we're just going to display a single recommended filename, but not do anything with it.
+        # For now just display a single recommended filename but do not do anything with it.
         recommended_filenames = [get_recommended_filename(path) for path in duplicates_of_checksum]
         recommended_filenames = {str(file.name) for file in recommended_filenames if file}
         recommended_filename = str(first(recommended_filenames, "N/A"))
