@@ -14,7 +14,11 @@ from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import Base as ExifBase
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.WARN)
+
+debug = True
+if debug:
+    logger.setLevel(logging.DEBUG)
 
 pil_logger = logging.getLogger("PIL")
 pil_logger.setLevel(logging.INFO)
@@ -134,7 +138,7 @@ def datestamp_to_filename_stem(date_obj: datetime):
     return date_obj.strftime("%Y%m%d_%H%M%S")
 
 
-def recommended_filename(image_path: Path):
+def get_recommended_filename(image_path: Path):
     image_type = guess_type(image_path)[0]
     if image_type.endswith("jpeg"):
         new_extension = "jpg"

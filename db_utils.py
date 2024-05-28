@@ -26,12 +26,12 @@ def consolidate_files_db(
         paths_to_remove = paths_to_consolidate
         logger.debug(f"T not in P: Paths to remove = {paths_to_remove}")
 
-    total_files_deleted = 0
     # Delete paths_to_remove
+    total_files_deleted = 0
     for path in paths_to_remove:
-        logger.debug(f"DB delete file {path}")
+        logger.debug(f"Deleting {str(path)} from database.")
         if not dry_run:
-            session.query(File).filter(File.name == path).delete()
+            session.query(File).filter(File.name == str(path)).delete()
         total_files_deleted += 1
 
     session.commit()

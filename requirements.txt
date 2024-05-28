@@ -1,5 +1,6 @@
 click
 google-auth-oauthlib
+more-itertools
 Pillow
 rich
 SQLAlchemy

@@ -6,3 +6,5 @@ __pycache__
 *.log*
 client_secret.json
 data/*
+data.bak
+testdata/*
