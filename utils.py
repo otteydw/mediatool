@@ -16,7 +16,7 @@ from PIL.ExifTags import Base as ExifBase
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARN)
 
-debug = False
+debug = True
 if debug:
     logger.setLevel(logging.DEBUG)
 

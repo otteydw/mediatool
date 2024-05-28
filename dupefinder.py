@@ -17,11 +17,9 @@ logging_setup()
 logger = logging.getLogger(__name__)
 
 
-debug = False
+debug = True
 if debug:
     logger.setLevel(logging.DEBUG)
-# else:
-#     logger.setLevel(logging.WARN)
 
 
 def find_duplicate_checksums(session: Session):
