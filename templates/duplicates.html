@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
     <div class="card mb-4">
-        <div class="card-header">Dupes of {{ checksum }}</div>
+        <div class="card-header">
+            Dupes of {{ checksum }}
+            <br>
+            {{ current }} of {{ total }}
+        </div>
         <div class="card-body">
             <img src="/pics/{{ duplicates_of_checksum[0] }}"
                  alt="{{ file }}"

@@ -35,7 +35,6 @@ def process_duplicates(page_number=1):
     )
 
     duplicate_checksums = db.paginate(query, page=page, per_page=1, error_out=False)
-    print(duplicate_checksums)
 
     # Since we paginate 1 item per "page", we only care about that first item.
     checksum = list(duplicate_checksums)[0]
@@ -55,8 +54,9 @@ def process_duplicates(page_number=1):
     return render_template(
         "duplicates.html",
         duplicates_of_checksum=duplicates_of_checksum,
-        page=page,
         next_url=next_url,
         prev_url=prev_url,
         checksum=checksum,
+        current=duplicate_checksums.page,
+        total=duplicate_checksums.total,
     )
