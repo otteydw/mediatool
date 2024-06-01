@@ -30,9 +30,12 @@ repos:
   - repo: https://github.com/djlint/djLint
     rev: v1.34.1
     hooks:
-      - id: djlint-reformat-django
-      - id: djlint-django
-        args: ['--ignore=H006,H021,H030,H031,D018']
+      - id: djlint-reformat
+      - id: djlint
+        args: ['--ignore=H006,H021,H030,H031']
+      - id: djlint-reformat-jinja
+      - id: djlint-jinja
+        args: ['--ignore=H006,H021,H030,H031']
   - repo: https://github.com/google/yamlfmt
     rev: v0.12.1
     hooks:
