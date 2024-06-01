@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="card mb-4">
+        <div class="card-header">Dupes of {{ checksum }}</div>
+        <div class="card-body">
+            <img src="/pics/{{ duplicates_of_checksum[0] }}"
+                 alt="{{ file }}"
+                 style="max-height:1000px;
+                        max-width:900px;
+                        height:auto;
+                        width:auto" />
+            <br>
+            <table id="datatablesSimple">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Filename</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in duplicates_of_checksum %}
+                        <tr>
+                            <td>{{ loop.counter }}</td>
+                            <td>
+                                <a href="/pics/{{ file }}">{{ file }}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if prev_url %}<a href="{{ prev_url }}">Previous</a>{% endif %}
+            {% if prev_url and next_url %}|{% endif %}
+            {% if next_url %}<a href="{{ next_url }}">Next</a>{% endif %}
+        </div>
+    </div>
+{% endblock content %}

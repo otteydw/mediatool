@@ -19,6 +19,14 @@ The dupefinder application uses the catalog previously created to report on whic
 python3 ./dupefinder.py
 ```
 
+A flask app has been added to perform this same task.
+
+```shell
+flask run --debug
+```
+
+Then the dupefine app will be available at [http://127.0.0.1:5000/dupes](http://127.0.0.1:5000/dupes).
+
 # Configuration
 
 The tools utilize a common configuration file named `mediatool.ini`.
