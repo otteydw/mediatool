@@ -6,6 +6,13 @@
             Dupes
         </div>
         <div class="card-body">
+            <img src="/pics/{{ duplicates_of_checksum[0] }}"
+                 alt="{{ file }}"
+                 style="max-height:1000px;
+                        max-width:900px;
+                        height:auto;
+                        width:auto" />
+            <br>
             <table id="datatablesSimple">
                 <thead>
                     <tr>
@@ -24,16 +31,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <img src="/pics/{{ duplicates_of_checksum[0] }}"
-                 alt="{{ file }}"
-                 style="max-height:1000px;
-                        max-width:900px;
-                        height:auto;
-                        width:auto" />
-            <br>
             <a href="{{ request.path }}?page={{ page - 1 }}">Previous</a> | <a href="{{ request.path }}?page={{ page + 1 }}">Next</a>
-            <br>
-            <a href="{{ url_for("view2") }}?page={{ page - 1 }}">Previous</a> | <a href="{{ url_for("view2") }}?page={{ page + 1 }}">Next</a>
         </div>
     </div>
 {% endblock content %}
