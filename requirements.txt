@@ -1,4 +1,6 @@
 click
+flask
+flask-sqlalchemy
 google-auth-oauthlib
 more-itertools
 Pillow
