@@ -10,7 +10,7 @@ from utils import load_config
 
 
 class Config:
-    DATA_DIR, DBFILE = load_config("mediatool.ini")
+    _, DBFILE = load_config("mediatool.ini")
     SQLALCHEMY_DATABASE_URI = f"sqlite+pysqlite:///{DBFILE}"
 
 
@@ -37,24 +37,26 @@ def process_duplicates(page_number=1):
     duplicate_checksums = db.paginate(query, page=page, per_page=1, error_out=False)
     print(duplicate_checksums)
 
-    for checksum in duplicate_checksums:
-        statement = select(File).filter_by(sha256=checksum)
-        duplicates_of_checksum = [
-            Path(dupe_set.name) for dupe_set in [row.File for row in db.session.execute(statement).all()]
-        ]
+    # Since we paginate 1 item per "page", we only care about that first item.
+    checksum = list(duplicate_checksums)[0]
 
-        prev_url = (
-            url_for("process_duplicates", page=duplicate_checksums.prev_num) if duplicate_checksums.has_prev else None
-        )
-        next_url = (
-            url_for("process_duplicates", page=duplicate_checksums.next_num) if duplicate_checksums.has_next else None
-        )
+    statement = select(File).filter_by(sha256=checksum)
+    duplicates_of_checksum = [
+        Path(dupe_set.name) for dupe_set in [row.File for row in db.session.execute(statement).all()]
+    ]
 
-        return render_template(
-            "duplicates.html",
-            duplicates_of_checksum=duplicates_of_checksum,
-            page=page,
-            request=request,
-            next_url=next_url,
-            prev_url=prev_url,
-        )
+    prev_url = (
+        url_for("process_duplicates", page=duplicate_checksums.prev_num) if duplicate_checksums.has_prev else None
+    )
+    next_url = (
+        url_for("process_duplicates", page=duplicate_checksums.next_num) if duplicate_checksums.has_next else None
+    )
+
+    return render_template(
+        "duplicates.html",
+        duplicates_of_checksum=duplicates_of_checksum,
+        page=page,
+        next_url=next_url,
+        prev_url=prev_url,
+        checksum=checksum,
+    )
