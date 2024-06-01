@@ -31,7 +31,9 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <a href="{{ request.path }}?page={{ page - 1 }}">Previous</a> | <a href="{{ request.path }}?page={{ page + 1 }}">Next</a>
+            {% if prev_url %}<a href="{{ prev_url }}">Previous</a>{% endif %}
+            {% if prev_url and next_url %}|{% endif %}
+            {% if next_url %}<a href="{{ next_url }}">Next</a>{% endif %}
         </div>
     </div>
 {% endblock content %}

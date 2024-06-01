@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import sqlalchemy as sa
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, render_template, request, send_from_directory, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, select, text
 from sqlalchemy.orm import Session
@@ -60,7 +60,7 @@ def process_duplicates2(db: SQLAlchemy, page_number=1):
         .having(sa.func.count(File.sha256) > 1)
     )
 
-    duplicate_checksums = db.paginate(query, page=page, per_page=1, error_out=False).items
+    duplicate_checksums = db.paginate(query, page=page, per_page=1, error_out=False)
     print(duplicate_checksums)
 
     for checksum in duplicate_checksums:
@@ -69,8 +69,16 @@ def process_duplicates2(db: SQLAlchemy, page_number=1):
             Path(dupe_set.name) for dupe_set in [row.File for row in db.session.execute(statement).all()]
         ]
 
+        prev_url = url_for("view2", page=duplicate_checksums.prev_num) if duplicate_checksums.has_prev else None
+        next_url = url_for("view2", page=duplicate_checksums.next_num) if duplicate_checksums.has_next else None
+
         return render_template(
-            "duplicates.html", duplicates_of_checksum=duplicates_of_checksum, page=page, request=request
+            "duplicates.html",
+            duplicates_of_checksum=duplicates_of_checksum,
+            page=page,
+            request=request,
+            next_url=next_url,
+            prev_url=prev_url,
         )
 
 
