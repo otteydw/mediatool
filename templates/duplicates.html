@@ -15,17 +15,12 @@
                         width:auto" />
             <br>
             <table id="datatablesSimple">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th></th>
-                        <th>Filename</th>
-                    </tr>
-                </thead>
                 <tbody>
                     {% for file in duplicates_of_checksum %}
                         <tr>
-                            <td>{{ loop.counter }}</td>
+                            <td>
+                                <a href="/pics/{{ file }}">View</a>
+                            </td>
                             <td>
                                 <form method="post" action="{{ url_for("process_duplicate") }}">
                                     <input type="hidden" name="page" value="{{ current }}">
@@ -34,9 +29,7 @@
                                     <button type="submit">Choose</button>
                                 </form>
                             </td>
-                            <td>
-                                <a href="/pics/{{ file }}">{{ file }}</a>
-                            </td>
+                            <td>{{ file }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
