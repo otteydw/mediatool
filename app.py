@@ -34,7 +34,7 @@ def pics(filename):
 
 
 @app.route("/dupes")
-def process_duplicates(page_number=1):
+def view_duplicates(page_number=1):
     page = request.args.get("page", page_number, type=int)
     query = (
         sa.select(File.sha256, sa.func.count(File.sha256).label("qty"))
@@ -59,12 +59,8 @@ def process_duplicates(page_number=1):
         Path(dupe_set.name) for dupe_set in [row.File for row in db.session.execute(statement).all()]
     ]
 
-    prev_url = (
-        url_for("process_duplicates", page=duplicate_checksums.prev_num) if duplicate_checksums.has_prev else None
-    )
-    next_url = (
-        url_for("process_duplicates", page=duplicate_checksums.next_num) if duplicate_checksums.has_next else None
-    )
+    prev_url = url_for("view_duplicates", page=duplicate_checksums.prev_num) if duplicate_checksums.has_prev else None
+    next_url = url_for("view_duplicates", page=duplicate_checksums.next_num) if duplicate_checksums.has_next else None
 
     all_files = [str(file) for file in duplicates_of_checksum]
 
@@ -80,8 +76,8 @@ def process_duplicates(page_number=1):
     )
 
 
-@app.route("/process_duplicate", methods=["POST"])
-def process_duplicate():
+@app.route("/consolidate", methods=["POST"])
+def consolidate():
     rq = request.form
     page = int(rq.get("page", "None"))
     file_to_keep = Path(rq.get("keep_file", "None"))
@@ -90,4 +86,4 @@ def process_duplicate():
     consolidate_files(all_files, file_to_keep)
     consolidate_files_db(db.session, all_files, file_to_keep)
     # return f"We kept {file_to_keep}<br><br>All files {all_files}"
-    return redirect(url_for("process_duplicates", page=page))
+    return redirect(url_for("view_duplicates", page=page))
