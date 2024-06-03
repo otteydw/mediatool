@@ -15,19 +15,21 @@
                         width:auto" />
             <br>
             <table id="datatablesSimple">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Filename</th>
-                    </tr>
-                </thead>
                 <tbody>
                     {% for file in duplicates_of_checksum %}
                         <tr>
-                            <td>{{ loop.counter }}</td>
                             <td>
-                                <a href="/pics/{{ file }}">{{ file }}</a>
+                                <a href="/pics/{{ file }}">View</a>
                             </td>
+                            <td>
+                                <form method="post" action="{{ url_for("consolidate") }}">
+                                    <input type="hidden" name="page" value="{{ current }}">
+                                    <input type="hidden" name="keep_file" value="{{ file }}">
+                                    <input type="hidden" name="all_files" value="{{ all_files }}">
+                                    <button type="submit">Choose</button>
+                                </form>
+                            </td>
+                            <td>{{ file }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
