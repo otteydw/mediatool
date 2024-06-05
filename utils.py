@@ -134,11 +134,41 @@ def get_datestamp(image_path: Path):
     return date_obj
 
 
-def datestamp_to_filename_stem(date_obj: datetime):
+def datestamp_to_filename_stem(date_obj: datetime) -> str:
+    """Datestampe to filname stem
+
+    Args:
+        date_obj (datetime): A datetime object
+
+    Returns:
+        str: The string representation of a new filename without extension.
+    """
     return date_obj.strftime("%Y%m%d_%H%M%S")
 
 
-def get_recommended_filename(image_path: Path):
+def datestamp_to_folder(date_obj: datetime) -> str:
+    """Datestamp to folder
+
+    Args:
+        date_obj (datetime): A datetime object
+
+    Returns:
+        str: The string representation of a folder structure in the format 'YYYY/MM/DD'
+    """
+    return date_obj.strftime("%Y/%m/%d")
+
+
+def get_recommended_filename(image_path: Path, date_folders=False, root_dir=None) -> Path:
+    """Provide a recommended filename for an image.
+
+    Args:
+        image_path (Path): The path of an image file
+        date_folders (bool, optional): Whether to prefix the recommended filename with recommended folders. Defaults to False.
+        root_dir (_type_, optional): The path of a directory to use instead of the file's current directory. Defaults to None.
+
+    Returns:
+        Path: The complete path to the recommended filename
+    """
     image_type = guess_type(image_path)[0]
     if image_type.endswith("jpeg"):
         new_extension = "jpg"
@@ -151,8 +181,12 @@ def get_recommended_filename(image_path: Path):
     if not datestamp_from_image:
         return None
 
+    parent_directory = root_dir if root_dir else image_path.parent
+
+    if date_folders:
+        parent_directory = parent_directory.joinpath(datestamp_to_folder(datestamp_from_image))
+
     new_stem = datestamp_to_filename_stem(datestamp_from_image)
-    parent_directory = image_path.parent
 
     new_filename = parent_directory.joinpath(f"{new_stem}.{new_extension}")
     return new_filename

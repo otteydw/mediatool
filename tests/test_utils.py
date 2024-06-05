@@ -6,6 +6,7 @@ import pytest
 from utils import (
     MediaType,
     datestamp_to_filename_stem,
+    datestamp_to_folder,
     datestring_to_date,
     get_datestamp,
     get_media_type,
@@ -75,10 +76,23 @@ def test_datestamp_to_filenam_stem():
     )
 
 
+def test_datestamp_to_folder():
+    assert datestamp_to_folder(datetime.strptime("2021-06-12 09:14:20", "%Y-%m-%d %H:%M:%S")) == "2021/06/12"
+
+
 def test_get_recommended_filename():
     assert get_recommended_filename(DATA_DIR.joinpath("Rose/20210612_091420_cap_extension.JPG")) == DATA_DIR.joinpath(
         "Rose/20210612_091420.jpg"
     )
+    assert get_recommended_filename(
+        DATA_DIR.joinpath("Rose/20210612_091420_cap_extension.JPG"), date_folders=True
+    ) == DATA_DIR.joinpath("Rose/2021/06/12/20210612_091420.jpg")
+    assert get_recommended_filename(
+        DATA_DIR.joinpath("Rose/20210612_091420_cap_extension.JPG"), root_dir=Path("/dingo")
+    ) == Path("/dingo/20210612_091420.jpg")
+    assert get_recommended_filename(
+        DATA_DIR.joinpath("Rose/20210612_091420_cap_extension.JPG"), root_dir=Path("/dingo"), date_folders=True
+    ) == Path("/dingo/2021/06/12/20210612_091420.jpg")
     assert get_recommended_filename(Path("/path/does/not/exist.txt")) is None
 
 
