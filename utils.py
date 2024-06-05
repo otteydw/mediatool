@@ -158,13 +158,13 @@ def datestamp_to_folder(date_obj: datetime) -> str:
     return date_obj.strftime("%Y/%m/%d")
 
 
-def get_recommended_filename(image_path: Path, date_folders=False, root_dir=None) -> Path:
+def get_recommended_filename(image_path: Path, date_folders: bool = False, root_dir: Path = None) -> Path:
     """Provide a recommended filename for an image.
 
     Args:
         image_path (Path): The path of an image file
         date_folders (bool, optional): Whether to prefix the recommended filename with recommended folders. Defaults to False.
-        root_dir (_type_, optional): The path of a directory to use instead of the file's current directory. Defaults to None.
+        root_dir (Path, optional): The path of a directory to use instead of the file's current directory. Defaults to None.
 
     Returns:
         Path: The complete path to the recommended filename
