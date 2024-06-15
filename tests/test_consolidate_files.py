@@ -1,4 +1,5 @@
 from pathlib import Path
+from tempfile import gettempdir
 
 import pytest
 
@@ -9,22 +10,28 @@ DATA_DIR = BASE_DIR.parent.joinpath("data")
 
 SOURCE_FILES = [DATA_DIR.joinpath(f"source{num}.txt") for num in range(5)]
 TARGET_FILE_FROM_SOURCES = SOURCE_FILES[0]
+NEW_TARGET = Path(gettempdir()).joinpath("new_target.txt")
 
 
-@pytest.fixture(params=[True, False])
+@pytest.fixture(params=["source", "same_dir", "temp_dir"])
 def testfiles(request):
-    target_from_source = request.param
+    target_from = request.param
     source_files = [DATA_DIR.joinpath(f"source{num}.txt") for num in range(5)]
     [path.touch() for path in source_files]
 
-    if target_from_source:
-        target_file = source_files[0]
-    else:
-        target_file = DATA_DIR.joinpath("target.txt")
+    match target_from:
+        case "source":
+            target_file = source_files[0]
+        case "same_dir":
+            target_file = DATA_DIR.joinpath("target.txt")
+        case "temp_dir":
+            target_file = NEW_TARGET
+        case _:
+            raise ValueError
 
     yield (source_files, target_file)
 
-    all_test_files = source_files + [target_file]
+    all_test_files = source_files + [target_file] + [NEW_TARGET]
     [path.unlink() for path in all_test_files if path.is_file()]
 
 
@@ -38,7 +45,9 @@ def testfiles(request):
 def test_consolidate_files(testfiles, dry_run):
     sources, target = testfiles
     expected = len(sources) - 1
-    print(f"Sources: {sources}")
+    print()
+    print(f"{sources=}")
+    print(f"{target=}")
     assert consolidate_files(sources, target, dry_run) == expected
 
     for path in sources:
